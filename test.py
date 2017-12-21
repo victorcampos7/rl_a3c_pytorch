@@ -12,7 +12,7 @@ import logging
 def test(args, shared_model, env_conf):
     log = {}
     setup_logger('{}_log'.format(args.env),
-                 r'{0}{1}_log'.format(args.log_dir, args.env))
+                 r'{0}{1}_{2}workers_log'.format(args.log_dir, args.env, args.workers))
     log['{}_log'.format(args.env)] = logging.getLogger(
         '{}_log'.format(args.env))
     d_args = vars(args)
