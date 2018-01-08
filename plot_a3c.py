@@ -39,6 +39,16 @@ def _parse_file(file_path, smoothing_factor):
     parsed_data = [_parse_line(line) for line in lines if _line_needs_parsing(line)]
     parsed_data = [list(t) for t in zip(*parsed_data)]
     t, parsed_data = parsed_data[0], parsed_data[1:]
+    
+    # The code resets the time after 24h
+    prev_t = -1
+    offset = 0
+    for idx, t_ in enumerate(t):
+    	if t_ < prev_t:
+    		offset += 24
+    	prev_t = t_
+    	t[idx] += offset
+
     parsed_data = [_exponential_moving_average_smoothing(d, smoothing_factor) for d in parsed_data]
     ep_reward, ep_length, mean_reward = parsed_data
     return t, ep_reward, ep_length, mean_reward
@@ -47,6 +57,9 @@ def _parse_file(file_path, smoothing_factor):
 def _generate_plots(t, ep_reward, ep_length, mean_reward, labels, output_file, title):
     # Create subplots
     fig, axarr = plt.subplots(1, sharex=True, figsize=(12, 9))
+
+    colormap = plt.cm.Set2
+    axarr.set_color_cycle([colormap(i) for i in np.linspace(0, 1, len(t))])
 
     for t_, ep_reward_, ep_length_, mean_reward_, label in zip(t, ep_reward, ep_length, mean_reward, labels):
         axarr.plot(t_, ep_reward_, label=label)
